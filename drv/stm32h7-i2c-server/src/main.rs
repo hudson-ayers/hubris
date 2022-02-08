@@ -45,12 +45,12 @@ fn validate_port<'a>(
     Ok(())
 }
 
-fn find_mux(
+fn find_mux<I: I2cMuxDriver>(
     controller: &I2cController,
     port: PortIndex,
-    muxes: &[I2cMux],
+    muxes: &[I2cMux<I>],
     mux: Option<(Mux, Segment)>,
-    mut func: impl FnMut(&I2cMux, Mux, Segment) -> Result<(), ResponseCode>,
+    mut func: impl FnMut(&I2cMux<I>, Mux, Segment) -> Result<(), ResponseCode>,
 ) -> Result<(), ResponseCode> {
     match mux {
         Some((id, segment)) => {
@@ -72,12 +72,12 @@ fn find_mux(
     }
 }
 
-fn configure_mux(
+fn configure_mux<I: I2cMuxDriver>(
     map: &mut MuxMap,
     controller: &I2cController,
     port: PortIndex,
     mux: Option<(Mux, Segment)>,
-    muxes: &[I2cMux],
+    muxes: &[I2cMux<I>],
     ctrl: &I2cControl,
 ) -> Result<(), ResponseCode> {
     find_mux(controller, port, muxes, mux, |mux, id, segment| {
@@ -105,11 +105,11 @@ fn configure_mux(
 
 ringbuf!(Option<ResponseCode>, 16, None);
 
-fn reset_if_needed(
+fn reset_if_needed<I: I2cMuxDriver>(
     code: ResponseCode,
     controller: &I2cController,
     port: PortIndex,
-    muxes: &[I2cMux],
+    muxes: &[I2cMux<I>],
     mux: Option<(Mux, Segment)>,
 ) {
     ringbuf_entry!(Some(code));
@@ -362,8 +362,8 @@ fn configure_pins(
     }
 }
 
-fn configure_muxes(
-    muxes: &[I2cMux],
+fn configure_muxes<I: I2cMuxDriver>(
+    muxes: &[I2cMux<I>],
     controllers: &[I2cController],
     pins: &[I2cPin],
     map: &mut PortMap,

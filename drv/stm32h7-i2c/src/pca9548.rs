@@ -26,7 +26,7 @@ bitfield! {
 impl I2cMuxDriver for Pca9548 {
     fn configure(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         _controller: &I2cController,
         gpio: &sys_api::Sys,
         _ctrl: &I2cControl,
@@ -36,7 +36,7 @@ impl I2cMuxDriver for Pca9548 {
 
     fn enable_segment(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         controller: &I2cController,
         segment: Segment,
         ctrl: &I2cControl,
@@ -89,7 +89,7 @@ impl I2cMuxDriver for Pca9548 {
 
     fn reset(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         gpio: &sys_api::Sys,
     ) -> Result<(), drv_i2c_api::ResponseCode> {
         mux.reset(gpio)

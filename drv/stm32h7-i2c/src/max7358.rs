@@ -71,7 +71,7 @@ enum Trace {
 ringbuf!(Trace, 32, Trace::None);
 
 fn read_regs(
-    mux: &I2cMux,
+    mux: &I2cMux<Max7358>,
     controller: &I2cController,
     rbuf: &mut [u8],
     ctrl: &I2cControl,
@@ -99,7 +99,7 @@ fn read_regs(
 }
 
 fn write_reg(
-    mux: &I2cMux,
+    mux: &I2cMux<Max7358>,
     controller: &I2cController,
     reg: Register,
     val: u8,
@@ -139,7 +139,7 @@ fn write_reg(
 impl I2cMuxDriver for Max7358 {
     fn configure(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         controller: &I2cController,
         gpio: &sys_api::Sys,
         ctrl: &I2cControl,
@@ -193,7 +193,7 @@ impl I2cMuxDriver for Max7358 {
 
     fn enable_segment(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         controller: &I2cController,
         segment: Segment,
         ctrl: &I2cControl,
@@ -232,7 +232,7 @@ impl I2cMuxDriver for Max7358 {
 
     fn reset(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         gpio: &sys_api::Sys,
     ) -> Result<(), drv_i2c_api::ResponseCode> {
         mux.reset(gpio)

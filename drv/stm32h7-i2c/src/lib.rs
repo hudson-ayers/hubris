@@ -64,12 +64,15 @@ pub enum I2cKonamiCode {
 ///
 /// A trait to express an I2C mux driver.
 ///
-pub trait I2cMuxDriver {
+pub trait I2cMuxDriver
+where
+    Self: Sized,
+{
     /// Configure the mux, specifying the mux and controller, but also an
     /// instance to a [`Gpio`] task.
     fn configure(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         controller: &I2cController,
         sys: &sys_api::Sys,
         ctrl: &I2cControl,
@@ -78,25 +81,25 @@ pub trait I2cMuxDriver {
     /// Reset the mux
     fn reset(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         sys: &sys_api::Sys,
     ) -> Result<(), drv_i2c_api::ResponseCode>;
 
     /// Enable the specified segment on the specified mux
     fn enable_segment(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         controller: &I2cController,
         segment: drv_i2c_api::Segment,
         ctrl: &I2cControl,
     ) -> Result<(), drv_i2c_api::ResponseCode>;
 }
 
-pub struct I2cMux<'a> {
+pub struct I2cMux<'a, I: I2cMuxDriver> {
     pub controller: drv_i2c_api::Controller,
     pub port: drv_i2c_api::PortIndex,
     pub id: drv_i2c_api::Mux,
-    pub driver: &'a dyn I2cMuxDriver,
+    pub driver: &'a I,
     pub enable: Option<I2cPin>,
     pub address: u8,
 }
@@ -141,7 +144,7 @@ enum Trace {
 
 ringbuf!(Trace, 48, Trace::None);
 
-impl<'a> I2cMux<'_> {
+impl<'a, I: I2cMuxDriver> I2cMux<'_, I> {
     /// A convenience routine to translate an error induced by in-band
     /// management into one that can be returned to a caller
     fn error_code(

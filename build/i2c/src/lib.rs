@@ -493,7 +493,7 @@ impl ConfigGenerator {
             r##"
     use drv_stm32h7_i2c::I2cMux;
 
-    pub fn muxes() -> [I2cMux<'static>; {}] {{"##,
+    pub fn muxes() -> [I2cMux<'static, drv_stm32h7_i2c::ltc4306::Ltc4306>; {}] {{"##,
             len
         )?;
 

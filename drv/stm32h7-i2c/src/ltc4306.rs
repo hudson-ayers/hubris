@@ -84,7 +84,7 @@ bitfield! {
 ringbuf!(u8, 16, 0);
 
 fn read_reg_u8(
-    mux: &I2cMux,
+    mux: &I2cMux<Ltc4306>,
     controller: &I2cController,
     reg: u8,
     ctrl: &I2cControl,
@@ -109,7 +109,7 @@ fn read_reg_u8(
 }
 
 fn write_reg_u8(
-    mux: &I2cMux,
+    mux: &I2cMux<Ltc4306>,
     controller: &I2cController,
     reg: u8,
     val: u8,
@@ -129,9 +129,10 @@ fn write_reg_u8(
 }
 
 impl I2cMuxDriver for Ltc4306 {
+    #[inline(never)]
     fn configure(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         _controller: &I2cController,
         gpio: &sys_api::Sys,
         _ctrl: &I2cControl,
@@ -139,9 +140,10 @@ impl I2cMuxDriver for Ltc4306 {
         mux.configure(gpio)
     }
 
+    #[inline(never)]
     fn enable_segment(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         controller: &I2cController,
         segment: Segment,
         ctrl: &I2cControl,
@@ -178,9 +180,10 @@ impl I2cMuxDriver for Ltc4306 {
         }
     }
 
+    #[inline(never)]
     fn reset(
         &self,
-        mux: &I2cMux,
+        mux: &I2cMux<Self>,
         gpio: &sys_api::Sys,
     ) -> Result<(), drv_i2c_api::ResponseCode> {
         mux.reset(gpio)
