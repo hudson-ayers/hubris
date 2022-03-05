@@ -944,6 +944,8 @@ fn build(
     // you change this line below, make sure to canonicalize path.
     let mut cmd = Command::new("cargo");
     cmd.arg("rustc")
+        .arg("-Z")
+        .arg("build-std=core,compiler_builtins")
         .arg("--release")
         .arg("--no-default-features")
         .arg("--target")
@@ -982,7 +984,28 @@ fn build(
              -C link-arg=-z -C link-arg=common-page-size=0x20 \
              -C link-arg=-z -C link-arg=max-page-size=0x20 \
              -C llvm-args=--enable-machine-outliner=never \
-             -C overflow-checks=y \
+             -C overflow-checks=n \
+             -C inline-threshold=7 \
+             --remap-path-prefix=/home/hudson/.rustup/toolchains/nightly-2021-09-22-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core=/core/ \
+             {}
+             ",
+            canonical_cargo_out_dir.display(),
+            remap_path_prefix,
+        ),
+    );
+
+    cmd.env(
+        "RUSTFLAGS",
+        &format!(
+            "-C link-arg=-Tlink.x \
+             -L {} \
+             -C link-arg=-z -C link-arg=common-page-size=0x20 \
+             -C link-arg=-z -C link-arg=max-page-size=0x20 \
+             -C llvm-args=--enable-machine-outliner=never \
+             -C overflow-checks=n \
+             -C inline-threshold=7 \
+             -C inline-threshold=7 \
+             --remap-path-prefix=/home/hudson/.rustup/toolchains/nightly-2021-09-22-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core=/core/ \
              {}
              ",
             canonical_cargo_out_dir.display(),
